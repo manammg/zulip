@@ -90,7 +90,6 @@ export function initialize(): void {
         });
 
         $("#main_div").on("contextmenu", ".messagebox", (e) => {
-            e.preventDefault();
             const selection = window.getSelection();
             if (selection !== null && selection.toString().length > 0) {
                 return;
@@ -99,6 +98,7 @@ export function initialize(): void {
             if ($target.closest("a, img").length > 0) {
                 return;
             }
+            e.preventDefault();
 
             const $row = $(e.currentTarget).closest(".message_row");
             const message_id = rows.id($row);
