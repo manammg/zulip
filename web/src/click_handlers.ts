@@ -19,6 +19,7 @@ import * as flatpickr from "./flatpickr.ts";
 import * as hash_util from "./hash_util.ts";
 import * as hashchange from "./hashchange.ts";
 import * as message_edit from "./message_edit.ts";
+import * as message_actions_popover from "./message_actions_popover.ts";
 import * as message_lists from "./message_lists.ts";
 import * as message_store from "./message_store.ts";
 import * as message_view from "./message_view.ts";
@@ -90,6 +91,22 @@ export function initialize(): void {
 
         $("#main_div").on("contextmenu", ".messagebox", (e) => {
             e.preventDefault();
+            const selection = window.getSelection();
+            if (selection !== null && selection.toString().length > 0) {
+                return;
+            }
+            const $target = $(e.target as HTMLElement);
+            if ($target.closest("a, img").length > 0) {
+                return;
+            }
+
+            const $row = $(e.currentTarget).closest(".message_row");
+            const message_id = rows.id($row);
+            const message = message_lists.current?.get(message_id);
+            if (message === undefined) {
+                return;
+            }
+            message_actions_popover.toggle_message_actions_menu(message);
         });
     }
 
