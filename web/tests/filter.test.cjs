@@ -189,6 +189,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(!filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.includes_full_stream_history());
@@ -239,6 +240,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(!filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.includes_full_stream_history());
@@ -259,6 +261,7 @@ test("basics", () => {
     assert.ok(filter.is_keyword_search());
     assert.ok(!filter.can_mark_messages_read());
     assert.ok(!filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.allow_use_first_unread_when_narrowing());
     assert.ok(!filter.can_apply_locally());
@@ -280,6 +283,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.can_apply_locally());
@@ -299,6 +303,7 @@ test("basics", () => {
     // want to have the channel in the tab bar or unsubscribe messaging, etc.
     terms = [{operator: "channel", operand: invalid_sub_id.toString(), negated: true}];
     filter = new Filter(terms);
+    assert.ok(filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.has_operator("channel"));
     assert.ok(!filter.can_mark_messages_read());
@@ -314,6 +319,7 @@ test("basics", () => {
     // be false, and we want "Search results" in the tab bar.
     terms = [{operator: "search", operand: "stop_word", negated: true}];
     filter = new Filter(terms);
+    assert.ok(filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(filter.has_operator("search"));
     assert.ok(!filter.can_apply_locally());
@@ -344,6 +350,7 @@ test("basics", () => {
 
     terms = [{operator: "channels", operand: "public", negated: true}];
     filter = new Filter(terms);
+    assert.ok(filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.has_operator("channels"));
     assert.ok(!filter.can_mark_messages_read());
@@ -358,6 +365,7 @@ test("basics", () => {
 
     terms = [{operator: "channels", operand: "public"}];
     filter = new Filter(terms);
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(filter.has_operator("channels"));
     assert.ok(!filter.can_mark_messages_read());
@@ -410,6 +418,7 @@ test("basics", () => {
 
     terms = [{operator: "is", operand: "dm"}];
     filter = new Filter(terms);
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(filter.contains_only_private_messages());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
@@ -425,6 +434,7 @@ test("basics", () => {
 
     terms = [{operator: "is", operand: "dm", negated: true}];
     filter = new Filter(terms);
+    assert.ok(filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
@@ -450,6 +460,7 @@ test("basics", () => {
 
     terms = [{operator: "is", operand: "mentioned"}];
     filter = new Filter(terms);
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.can_mark_messages_read());
     assert.ok(!filter.contains_no_partial_conversations());
@@ -465,6 +476,7 @@ test("basics", () => {
 
     terms = [{operator: "is", operand: "starred"}];
     filter = new Filter(terms);
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.can_mark_messages_read());
     assert.ok(!filter.contains_no_partial_conversations());
@@ -479,6 +491,7 @@ test("basics", () => {
     terms = [{operator: "dm", operand: [joe.user_id]}];
     filter = new Filter(terms);
     assert.ok(filter.is_search_for_specific_group_or_user());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(filter.contains_only_private_messages());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
@@ -497,6 +510,7 @@ test("basics", () => {
     ];
     filter = new Filter(terms);
     assert.ok(filter.is_search_for_specific_group_or_user());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(filter.contains_only_private_messages());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
@@ -512,6 +526,7 @@ test("basics", () => {
     terms = [{operator: "dm", operand: [joe.user_id, steve.user_id]}];
     filter = new Filter(terms);
     assert.ok(filter.is_search_for_specific_group_or_user());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(filter.contains_only_private_messages());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
@@ -528,6 +543,7 @@ test("basics", () => {
         {operator: "with", operand: "12"},
     ];
     filter = new Filter(terms);
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(filter.contains_only_private_messages());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
@@ -550,6 +566,7 @@ test("basics", () => {
     terms = [{operator: "dm-including", operand: [joe.user_id]}];
     filter = new Filter(terms);
     assert.ok(filter.is_search_for_specific_group_or_user());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(filter.contains_only_private_messages());
     assert.ok(!filter.has_operator("search"));
     assert.ok(!filter.can_mark_messages_read());
@@ -571,6 +588,7 @@ test("basics", () => {
 
     terms = [{operator: "is", operand: "resolved"}];
     filter = new Filter(terms);
+    assert.ok(filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.has_operator("search"));
     assert.ok(filter.can_mark_messages_read());
@@ -595,6 +613,7 @@ test("basics", () => {
         {operator: "in", operand: "all"},
     ];
     filter = new Filter(terms);
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.has_operator("search"));
     assert.ok(!filter.can_mark_messages_read());
@@ -617,6 +636,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.includes_full_stream_history());
@@ -638,6 +658,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.includes_full_stream_history());
@@ -660,6 +681,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.includes_full_stream_history());
@@ -679,6 +701,7 @@ test("basics", () => {
     assert.ok(!filter.is_keyword_search());
     assert.ok(!filter.can_mark_messages_read());
     assert.ok(filter.contains_no_partial_conversations());
+    assert.ok(!filter.may_have_incomplete_message_history());
     assert.ok(!filter.contains_only_private_messages());
     assert.ok(!filter.allow_use_first_unread_when_narrowing());
     assert.ok(filter.includes_full_stream_history());
@@ -1907,6 +1930,8 @@ test("describe", ({mock_template, override}) => {
     assert.equal(Filter.search_description_as_html(narrow, false), string);
     page_params.is_spectator = false;
 
+    const devel_decorated = `<span class="decorated-channel-name-wrapper inline-decorated-channel-name"><span class="channel-privacy-type-icon"><i class="zulip-icon zulip-icon-hashtag" aria-hidden="true"></i></span><span class="decorated-channel-name">devel</span></span>`;
+    const river_decorated = `<span class="decorated-channel-name-wrapper inline-decorated-channel-name"><span class="channel-privacy-type-icon"><i class="zulip-icon zulip-icon-hashtag" aria-hidden="true"></i></span><span class="decorated-channel-name">river</span></span>`;
     const devel_id = new_stream_id();
     make_sub("devel", devel_id);
 
@@ -1914,7 +1939,7 @@ test("describe", ({mock_template, override}) => {
         {operator: "channel", operand: devel_id.toString()},
         {operator: "is", operand: "starred"},
     ];
-    string = "messages in #devel, starred messages";
+    string = `messages in ${devel_decorated}, starred messages`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     const river_id = new_stream_id();
@@ -1923,14 +1948,14 @@ test("describe", ({mock_template, override}) => {
         {operator: "channel", operand: river_id.toString()},
         {operator: "is", operand: "unread"},
     ];
-    string = "messages in #river, unread messages";
+    string = `messages in ${river_decorated}, unread messages`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [
         {operator: "channel", operand: devel_id.toString()},
         {operator: "topic", operand: "JS"},
     ];
-    string = "messages in #devel > JS";
+    string = `messages in ${devel_decorated} > JS`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [
@@ -1989,7 +2014,7 @@ test("describe", ({mock_template, override}) => {
         {operator: "channel", operand: devel_id.toString()},
         {operator: "topic", operand: "JS", negated: true},
     ];
-    string = "messages in #devel, exclude topic JS";
+    string = `messages in ${devel_decorated}, exclude topic JS`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [
@@ -2003,28 +2028,28 @@ test("describe", ({mock_template, override}) => {
         {operator: "channel", operand: devel_id.toString()},
         {operator: "is", operand: "starred", negated: true},
     ];
-    string = "messages in #devel, exclude starred messages";
+    string = `messages in ${devel_decorated}, exclude starred messages`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [
         {operator: "channel", operand: devel_id.toString()},
         {operator: "has", operand: "image", negated: true},
     ];
-    string = "messages in #devel, exclude messages with images";
+    string = `messages in ${devel_decorated}, exclude messages with images`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [
         {operator: "has", operand: "abc", negated: true},
         {operator: "channel", operand: devel_id.toString()},
     ];
-    string = "invalid abc operand for has operator, messages in #devel";
+    string = `invalid abc operand for has operator, messages in ${devel_decorated}`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [
         {operator: "has", operand: "image", negated: true},
         {operator: "channel", operand: devel_id.toString()},
     ];
-    string = "exclude messages with images, messages in #devel";
+    string = `exclude messages with images, messages in ${devel_decorated}`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [];
@@ -2035,7 +2060,7 @@ test("describe", ({mock_template, override}) => {
         {operator: "channel", operand: devel_id.toString()},
         {operator: "subject", operand: "JS", negated: true},
     ];
-    string = "messages in #devel, exclude topic JS";
+    string = `messages in ${devel_decorated}, exclude topic JS`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     // Empty string topic involved.
@@ -2044,8 +2069,7 @@ test("describe", ({mock_template, override}) => {
         {operator: "channel", operand: devel_id.toString()},
         {operator: "topic", operand: ""},
     ];
-    string =
-        'messages in #devel > <span class="empty-topic-display">translated: general chat</span>';
+    string = `messages in ${devel_decorated} > <span class="empty-topic-display">translated: general chat</span>`;
     assert.equal(Filter.search_description_as_html(narrow, false), string);
 
     narrow = [

@@ -83,7 +83,7 @@ mock_esm("../src/settings_realm_user_settings_defaults", {
     maybe_disable_widgets() {},
 });
 mock_esm("../src/settings_streams", {
-    maybe_disable_widgets() {},
+    rerender_default_streams_for_role_change() {},
 });
 
 const bot_data = zrequire("bot_data");

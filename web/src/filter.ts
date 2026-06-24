@@ -17,6 +17,7 @@ import * as resolved_topic from "./resolved_topic.ts";
 import {current_user, narrow_canonical_term_schema, narrow_operator_schema} from "./state_data.ts";
 import type {NarrowCanonicalTerm, NarrowTerm, NarrowTermSuggestion} from "./state_data.ts";
 import * as stream_data from "./stream_data.ts";
+import type {StreamSubscription} from "./sub_store.ts";
 import * as sub_store from "./sub_store.ts";
 import * as user_topics from "./user_topics.ts";
 import * as util from "./util.ts";
@@ -41,14 +42,14 @@ type Part =
       }
     | {
           type: "channel_topic";
-          channel: string;
+          stream: StreamSubscription;
           topic_display_name: string;
           is_empty_string_topic: boolean;
       }
     | {
           type: "channel";
           prefix_for_operator: string;
-          operand: string;
+          stream: StreamSubscription;
       }
     | {
           type: "is_operator";
@@ -859,13 +860,13 @@ export class Filter {
                 term_1.operator === "topic" &&
                 !term_1.negated
             ) {
-                // `channel` might be undefined if it's coming from a text query
-                const channel = stream_data.get_sub_by_id_string(term_0.operand)?.name;
-                if (channel) {
+                // `sub` might be undefined if it's coming from a text query.
+                const sub = stream_data.get_sub_by_id_string(term_0.operand);
+                if (sub) {
                     const topic = term_1.operand;
                     parts.push({
                         type: "channel_topic",
-                        channel,
+                        stream: sub,
                         topic_display_name: util.get_final_topic_display_name(topic),
                         is_empty_string_topic: topic === "",
                     });
@@ -931,8 +932,8 @@ export class Filter {
                     if (stream) {
                         return {
                             type: "channel",
-                            prefix_for_operator: verb + "messages in #",
-                            operand: stream.name,
+                            prefix_for_operator: verb + "messages in ",
+                            stream,
                         };
                     }
                     // Assume the operand is a partially formed name and return
@@ -1721,6 +1722,20 @@ export class Filter {
             // anchor because they target a specific message.
             (this.can_mark_messages_read() && !this.is_conversation_view_with_near()) ||
             (this.has_operator("is") && !this.has_operand("is", "starred"))
+        );
+    }
+
+    may_have_incomplete_message_history(treat_combined_feed_as_complete = true): boolean {
+        // Whether the filter may not include all messages.
+        return (
+            (!treat_combined_feed_as_complete || !this.is_in_home()) &&
+            !this.contains_only_private_messages() &&
+            !this.includes_full_stream_history() &&
+            !this.is_personal_filter() &&
+            !(
+                _.isEqual(this.sorted_term_types(), ["sender", "has-reaction"]) &&
+                this.terms_with_operator("sender")[0]!.operand === people.my_current_user_id()
+            )
         );
     }
 

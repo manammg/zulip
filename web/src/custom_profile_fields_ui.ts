@@ -245,6 +245,14 @@ export function format_date(date: Date | undefined, format: string): string {
     return flatpickr.formatDate(date, format);
 }
 
+// The "has-date" class controls the clear-date button's visibility,
+// so derive it from the visible alt input's value.
+function update_has_date_class($custom_user_field: JQuery): void {
+    const has_value =
+        $custom_user_field.find<HTMLInputElement>(".date-field-alt-input").val()!.length > 0;
+    $custom_user_field.toggleClass("has-date", has_value);
+}
+
 export function initialize_custom_date_type_fields(
     element_id: string,
     user_id: number,
@@ -286,6 +294,7 @@ export function initialize_custom_date_type_fields(
             );
             const original_value = people.get_custom_profile_data(user_id, field_id)?.value ?? "";
             instance.setDate(original_value);
+            update_has_date_class($input_elem.closest(".custom_user_field"));
             if (!for_profile_settings_panel) {
                 // Trigger "input" event so that save button state can
                 // be toggled in "Manage user" modal.
@@ -326,7 +335,6 @@ export function initialize_custom_date_type_fields(
         altInputClass: "date-field-alt-input " + common_class_name,
         altFormat: "F j, Y",
         allowInput: true,
-        static: true,
         // This helps us in accepting inputs in other formats
         // like MM/DD/YYYY and basically any other format
         // which is accepted by Date.
@@ -338,8 +346,20 @@ export function initialize_custom_date_type_fields(
         // values.
         formatDate: format_date,
         allowInvalidPreload: true,
+        // Close the date picker on scroll, since flatpickr leaves the
+        // open calendar in place and it would drift away from the input.
+        onOpen(_selected_dates, _date_str, instance) {
+            window.addEventListener(
+                "scroll",
+                () => {
+                    instance.close();
+                },
+                {capture: true, once: true},
+            );
+        },
         onChange(_selected_dates, date_str, instance) {
             update_date(instance, date_str);
+            update_has_date_class($(instance.element).closest(".custom_user_field"));
         },
     });
 
@@ -376,23 +396,26 @@ export function initialize_custom_date_type_fields(
         });
 
     $(element_id)
-        .find<HTMLInputElement>(".custom_user_field input.datepicker")
-        .on("mouseenter", function () {
-            if ($(this).val()!.length <= 0) {
-                $(this).parent().find(".remove_date").hide();
-            } else {
-                $(this).parent().find(".remove_date").show();
-            }
-        });
-
-    $(element_id)
         .find(".custom_user_field .remove_date")
         .on("click", function () {
             const $custom_user_field = $(this).parent().find(".custom_user_field_value");
             const $displayed_input = $(this).parent().find(".date-field-alt-input");
             $displayed_input.val("");
             $custom_user_field.val("");
+            update_has_date_class($(this).closest(".custom_user_field"));
             $custom_user_field.trigger("input");
+        });
+
+    $(element_id)
+        .find<HTMLInputElement>("input.date-field-alt-input")
+        .on("input", function () {
+            update_has_date_class($(this).closest(".custom_user_field"));
+        });
+
+    $(element_id)
+        .find(".custom_user_field .datepicker")
+        .each(function () {
+            update_has_date_class($(this).closest(".custom_user_field"));
         });
 }
 

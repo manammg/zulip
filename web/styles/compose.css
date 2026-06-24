@@ -91,6 +91,10 @@
             flex-grow: 1;
             display: flex;
             overflow: hidden;
+
+            .compose_reply_button:disabled {
+                cursor: default;
+            }
         }
 
         #left_bar_compose_reply_button_big {
@@ -366,7 +370,11 @@
     border-radius: 4px;
     border: 1px solid var(--color-message-content-container-border);
 
-    &:has(.new_message_textarea:focus) {
+    /* The :active selector ensures we don't have a moment
+       where the compose-area focus ring disappears while
+       a formatting button is clicked. */
+    &:has(.new_message_textarea:focus),
+    &:has(~ #message-formatting-controls-container:active) {
         border-color: var(--color-message-content-container-border-focus);
     }
 
